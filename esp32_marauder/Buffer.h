@@ -24,6 +24,7 @@ class Buffer {
     void gpxOpen(String file_name, fs::FS* fs, bool serial);
     void append(wifi_promiscuous_pkt_t *packet, int len);
     void append(String log);
+    void append(const char* log);
     void save();
     String getFileName();
   private:

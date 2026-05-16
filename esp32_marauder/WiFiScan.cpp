@@ -541,7 +541,11 @@ extern "C" {
                     display_string.concat(F(" | GPS: No Fix"));
                   }
 
-                  String wardrive_line = (String)advertisedDevice->getAddress().toString().c_str() + ",,[BLE]," + gps_obj.getDatetime() + ",0," + (String)advertisedDevice->getRSSI() + "," + gps_obj.getLat() + "," + gps_obj.getLon() + "," + gps_obj.getAlt() + "," + gps_obj.getAccuracy() + ",BLE\n";
+                  char wardrive_line[256];
+                  snprintf(wardrive_line, sizeof(wardrive_line), "%s,,[BLE],%s,0,%d,%s,%s,%s,%s,BLE\n",
+                           advertisedDevice->getAddress().toString().c_str(), gps_obj.getDatetime().c_str(),
+                           advertisedDevice->getRSSI(), gps_obj.getLat().c_str(), gps_obj.getLon().c_str(),
+                           gps_obj.getAlt().c_str(), gps_obj.getAccuracy().c_str());
                   Serial.print(wardrive_line);
 
                   if (do_save)
@@ -902,7 +906,11 @@ extern "C" {
                     }
                   #endif
 
-                  String wardrive_line = (String)advertisedDevice->getAddress().toString().c_str() + ",,[BLE]," + gps_obj.getDatetime() + ",0," + (String)advertisedDevice->getRSSI() + "," + gps_obj.getLat() + "," + gps_obj.getLon() + "," + gps_obj.getAlt() + "," + gps_obj.getAccuracy() + ",BLE\n";
+                  char wardrive_line[256];
+                  snprintf(wardrive_line, sizeof(wardrive_line), "%s,,[BLE],%s,0,%d,%s,%s,%s,%s,BLE\n",
+                           advertisedDevice->getAddress().toString().c_str(), gps_obj.getDatetime().c_str(),
+                           advertisedDevice->getRSSI(), gps_obj.getLat().c_str(), gps_obj.getLon().c_str(),
+                           gps_obj.getAlt().c_str(), gps_obj.getAccuracy().c_str());
                   Serial.print(wardrive_line);
 
                   wifi_scan_obj.save_mac(mac_char);
@@ -1314,7 +1322,11 @@ extern "C" {
                     display_string.concat(F(" | GPS: No Fix"));
                   }
 
-                  String wardrive_line = (String)advertisedDevice->getAddress().toString().c_str() + ",,[BLE]," + gps_obj.getDatetime() + ",0," + (String)advertisedDevice->getRSSI() + "," + gps_obj.getLat() + "," + gps_obj.getLon() + "," + gps_obj.getAlt() + "," + gps_obj.getAccuracy() + ",BLE\n";
+                  char wardrive_line[256];
+                  snprintf(wardrive_line, sizeof(wardrive_line), "%s,,[BLE],%s,0,%d,%s,%s,%s,%s,BLE\n",
+                           advertisedDevice->getAddress().toString().c_str(), gps_obj.getDatetime().c_str(),
+                           advertisedDevice->getRSSI(), gps_obj.getLat().c_str(), gps_obj.getLon().c_str(),
+                           gps_obj.getAlt().c_str(), gps_obj.getAccuracy().c_str());
                   Serial.print(wardrive_line);
 
                   if (do_save)
@@ -1675,7 +1687,11 @@ extern "C" {
                     }
                   #endif
 
-                  String wardrive_line = (String)advertisedDevice->getAddress().toString().c_str() + ",,[BLE]," + gps_obj.getDatetime() + ",0," + (String)advertisedDevice->getRSSI() + "," + gps_obj.getLat() + "," + gps_obj.getLon() + "," + gps_obj.getAlt() + "," + gps_obj.getAccuracy() + ",BLE\n";
+                  char wardrive_line[256];
+                  snprintf(wardrive_line, sizeof(wardrive_line), "%s,,[BLE],%s,0,%d,%s,%s,%s,%s,BLE\n",
+                           advertisedDevice->getAddress().toString().c_str(), gps_obj.getDatetime().c_str(),
+                           advertisedDevice->getRSSI(), gps_obj.getLat().c_str(), gps_obj.getLon().c_str(),
+                           gps_obj.getAlt().c_str(), gps_obj.getAccuracy().c_str());
                   Serial.print(wardrive_line);
 
                   wifi_scan_obj.save_mac(mac_char);
@@ -3078,58 +3094,44 @@ void WiFiScan::save_mac(unsigned char* mac) {
   this->mac_history_cursor++;
 }
 
-String WiFiScan::security_int_to_string(int security_type) {
+const char* WiFiScan::security_int_to_string(int security_type) {
   //Provide a security type int from WiFi.encryptionType(i) to convert it to a String which Wigle CSV expects.
-  String authtype = "";
-
   switch (security_type) {
     case WIFI_AUTH_OPEN:
-      authtype = "[OPEN]";
-      break;
+      return "[OPEN]";
   
     case WIFI_AUTH_WEP:
-      authtype = "[WEP]";
-      break;
+      return "[WEP]";
   
     case WIFI_AUTH_WPA_PSK:
-      authtype = "[WPA_PSK]";
-      break;
+      return "[WPA_PSK]";
   
     case WIFI_AUTH_WPA2_PSK:
-      authtype = "[WPA2_PSK]";
-      break;
+      return "[WPA2_PSK]";
   
     case WIFI_AUTH_WPA_WPA2_PSK:
-      authtype = "[WPA_WPA2_PSK]";
-      break;
+      return "[WPA_WPA2_PSK]";
   
     case WIFI_AUTH_WPA2_ENTERPRISE:
-      authtype = "[WPA2]";
-      break;
+      return "[WPA2]";
 
     //Requires at least v2.0.0 of https://github.com/espressif/arduino-esp32/
     case WIFI_AUTH_WPA3_PSK:
-      authtype = "[WPA3_PSK]";
-      break;
+      return "[WPA3_PSK]";
 
     #ifdef HAS_IDF_3
     case WIFI_AUTH_WPA3_ENTERPRISE:
-      authtype = "[WPA3]";
-      break;
+      return "[WPA3]";
     #endif
     case WIFI_AUTH_WPA2_WPA3_PSK:
-      authtype = "[WPA2_WPA3_PSK]";
-      break;
+      return "[WPA2_WPA3_PSK]";
 
     case WIFI_AUTH_WAPI_PSK:
-      authtype = "[WAPI_PSK]";
-      break;
+      return "[WAPI_PSK]";
         
     default:
-      authtype = "[UNDEFINED]";
+      return "[UNDEFINED]";
   }
-
-  return authtype;
 }
 
 void WiFiScan::startPcap(String file_name) {
@@ -3184,7 +3186,9 @@ void WiFiScan::setupScanDisplayArea(uint16_t background, uint16_t color) {
 }
 
 void WiFiScan::writeNetworkInfo() {
-  buffer_obj.append("\nSSID: " + (String)this->connected_network);
+  char ssid_buf[64];
+  snprintf(ssid_buf, sizeof(ssid_buf), "\nSSID: %s", this->connected_network.c_str());
+  buffer_obj.append(ssid_buf);
   buffer_obj.append("\nIP address: ");
   buffer_obj.append(this->ip_addr.toString());
   buffer_obj.append("\nGateway: ");
@@ -3192,7 +3196,7 @@ void WiFiScan::writeNetworkInfo() {
   buffer_obj.append("\nNetmask: ");
   buffer_obj.append(this->subnet.toString());
   buffer_obj.append("\nMAC: ");
-  buffer_obj.append((String)WiFi.macAddress());
+  buffer_obj.append(WiFi.macAddress());
   buffer_obj.append("\n");
 }
 
@@ -3818,16 +3822,15 @@ void WiFiScan::logPoint(String lat, String lon, float alt, String datetime, bool
   datetime.replace(" ", "T");
   datetime += "Z";
 
-  if (!poi)
-    buffer_obj.append("    <trkpt lat=\"" + lat + "\" lon=\"" + lon + "\">\n");
-  else
-    buffer_obj.append("    <wpt lat=\"" + lat + "\" lon=\"" + lon + "\">\n");
-  buffer_obj.append("      <ele>" + String(alt, 2) + "</ele>\n");
-  buffer_obj.append("      <time>" + datetime + "</time>\n");
-  if (!poi)
-    buffer_obj.append("    </trkpt>\n");
-  else
-    buffer_obj.append("    </wpt>\n");
+  char gpx_buf[256];
+  snprintf(gpx_buf, sizeof(gpx_buf),
+           "    <%s lat=\"%s\" lon=\"%s\">\n"
+           "      <ele>%.2f</ele>\n"
+           "      <time>%s</time>\n"
+           "    </%s>\n",
+           poi ? "wpt" : "trkpt", lat.c_str(), lon.c_str(),
+           alt, datetime.c_str(), poi ? "wpt" : "trkpt");
+  buffer_obj.append(gpx_buf);
   //gpxFile.flush();
 }
 
@@ -4951,7 +4954,11 @@ void WiFiScan::executeWarDrive() {
             #endif
           }
 
-          String wardrive_line = WiFi.BSSIDstr(i) + "," + ssid + "," + this->security_int_to_string(WiFi.encryptionType(i)) + "," + gps_obj.getDatetime() + "," + (String)WiFi.channel(i) + "," + (String)WiFi.RSSI(i) + "," + gps_obj.getLat() + "," + gps_obj.getLon() + "," + gps_obj.getAlt() + "," + gps_obj.getAccuracy() + ",WIFI\n";
+          char wardrive_line[256];
+          snprintf(wardrive_line, sizeof(wardrive_line), "%s,%s,%s,%s,%d,%d,%s,%s,%s,%s,WIFI\n",
+                   WiFi.BSSIDstr(i).c_str(), ssid.c_str(), this->security_int_to_string(WiFi.encryptionType(i)),
+                   gps_obj.getDatetime().c_str(), WiFi.channel(i), WiFi.RSSI(i),
+                   gps_obj.getLat().c_str(), gps_obj.getLon().c_str(), gps_obj.getAlt().c_str(), gps_obj.getAccuracy().c_str());
           Serial.print((String)this->mac_history_cursor + " | " + wardrive_line);
 
           if (do_save) {
@@ -5134,8 +5141,8 @@ void WiFiScan::RunBeaconScan(uint8_t scan_mode, uint16_t color) {
     #ifdef HAS_GPS
       if (gps_obj.getGpsModuleStatus()) {
         startLog(F("wardrive"));
-        String header_line = "WigleWifi-1.4,appRelease=" + (String)MARAUDER_VERSION + ",model=ESP32 Marauder,release=" + (String)MARAUDER_VERSION + ",device=ESP32 Marauder,display=SPI TFT,board=ESP32 Marauder,brand=JustCallMeKoko\nMAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
-        buffer_obj.append(header_line);
+        static const char WIGLE_HEADER[] PROGMEM = "WigleWifi-1.4,appRelease=" MARAUDER_VERSION ",model=ESP32 Marauder,release=" MARAUDER_VERSION ",device=ESP32 Marauder,display=SPI TFT,board=ESP32 Marauder,brand=JustCallMeKoko\nMAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
+        buffer_obj.append(FPSTR(WIGLE_HEADER));
         this->openPoiFile();
       } else {
         return;
@@ -5324,8 +5331,8 @@ void WiFiScan::RunProbeScan(uint8_t scan_mode, uint16_t color) {
     #ifdef HAS_GPS
       if (gps_obj.getGpsModuleStatus()) {
         startLog(F("station_wardrive"));
-        String header_line = "WigleWifi-1.4,appRelease=" + (String)MARAUDER_VERSION + ",model=ESP32 Marauder,release=" + (String)MARAUDER_VERSION + ",device=ESP32 Marauder,display=SPI TFT,board=ESP32 Marauder,brand=JustCallMeKoko\nMAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
-        buffer_obj.append(header_line);
+        static const char WIGLE_HEADER[] PROGMEM = "WigleWifi-1.4,appRelease=" MARAUDER_VERSION ",model=ESP32 Marauder,release=" MARAUDER_VERSION ",device=ESP32 Marauder,display=SPI TFT,board=ESP32 Marauder,brand=JustCallMeKoko\nMAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
+        buffer_obj.append(FPSTR(WIGLE_HEADER));
       } else {
         return;
       }
@@ -5472,8 +5479,8 @@ void WiFiScan::RunBluetoothScan(uint8_t scan_mode, uint16_t color) {
             this->startWardriverWiFi();
             this->wifi_initialized = true;
           }
-          String header_line = "WigleWifi-1.4,appRelease=" + (String)MARAUDER_VERSION + ",model=ESP32 Marauder,release=" + (String)MARAUDER_VERSION + ",device=ESP32 Marauder,display=SPI TFT,board=ESP32 Marauder,brand=JustCallMeKoko\nMAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
-          buffer_obj.append(header_line);
+          static const char WIGLE_HEADER[] PROGMEM = "WigleWifi-1.4,appRelease=" MARAUDER_VERSION ",model=ESP32 Marauder,release=" MARAUDER_VERSION ",device=ESP32 Marauder,display=SPI TFT,board=ESP32 Marauder,brand=JustCallMeKoko\nMAC,SSID,AuthMode,FirstSeen,Channel,RSSI,CurrentLatitude,CurrentLongitude,AltitudeMeters,AccuracyMeters,Type\n";
+          buffer_obj.append(FPSTR(WIGLE_HEADER));
         }
       #endif
 
@@ -7323,11 +7330,15 @@ void WiFiScan::beaconSnifferCallback(void* buf, wifi_promiscuous_pkt_type_t type
                   for (int i = 0; i < n; i++) {
                     Serial.printf("%-32.32s", WiFi.SSID(i).c_str());
                     Serial.print(F(" -> "));
-                    Serial.println(wifi_scan_obj.security_int_to_string(WiFi.encryptionType(i)).c_str());
+                    Serial.println(wifi_scan_obj.security_int_to_string(WiFi.encryptionType(i)));
                   }
                 }
-                String wardrive_line = (String)addr + "," + essid + "," + wifi_scan_obj.security_int_to_string(snifferPacket->rx_ctrl.channel) + "," + gps_obj.getDatetime() + "," + (String)snifferPacket->rx_ctrl.channel + "," + (String)snifferPacket->rx_ctrl.rssi + "," + gps_obj.getLat() + "," + gps_obj.getLon() + "," + gps_obj.getAlt() + "," + gps_obj.getAccuracy() + ",WIFI";
-                Serial.println(wardrive_line);
+                char wardrive_line[256];
+                snprintf(wardrive_line, sizeof(wardrive_line), "%s,%s,%s,%s,%d,%d,%s,%s,%s,%s,WIFI\n",
+                         addr, essid.c_str(), wifi_scan_obj.security_int_to_string(snifferPacket->rx_ctrl.channel),
+                         gps_obj.getDatetime().c_str(), snifferPacket->rx_ctrl.channel, snifferPacket->rx_ctrl.rssi,
+                         gps_obj.getLat().c_str(), gps_obj.getLon().c_str(), gps_obj.getAlt().c_str(), gps_obj.getAccuracy().c_str());
+                Serial.print(wardrive_line);
                 //buffer_obj.append(wardrive_line);
               }
             }

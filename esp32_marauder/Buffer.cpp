@@ -133,6 +133,13 @@ void Buffer::append(String log) {
   }
 }
 
+void Buffer::append(const char* log) {
+  bool save_packet = settings_obj.loadSetting<bool>(text_table4[7]);
+  if (save_packet && log) {
+    add((const uint8_t*)log, strlen(log), false);
+  }
+}
+
 void Buffer::write(int32_t n){
   uint8_t buf[4];
   buf[0] = n;

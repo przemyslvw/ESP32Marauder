@@ -844,7 +844,7 @@ class WiFiScan
     void renderRawStats();
     void renderPacketRate();
     void displayAnalyzerString(String str);
-    String security_int_to_string(int security_type);
+    const char* security_int_to_string(int security_type);
     void RunSetup();
     int clearList(uint8_t list_type);
     bool addSSID(String essid);
